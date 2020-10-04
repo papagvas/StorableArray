@@ -80,9 +80,9 @@ base64Exp str = do
 base64 :: QQ.QuasiQuoter 
 base64 = QQ.QuasiQuoter {
   QQ.quoteExp = base64Exp ,
-  QQ.quoteDec = undefined ,
-  QQ.quotePat = undefined ,
-  QQ.quoteType = undefined 
+  QQ.quoteDec = error "Usage as declaration is not supported" ,
+  QQ.quotePat = error "Usage as pattern is not supported" ,
+  QQ.quoteType = error "Usage as type is not supported" 
 }
 
 base16Alph = map Chr.chr $ [48..57] ++ [65..70] -- helper function
@@ -122,9 +122,9 @@ base16Exp str = do
 base16 :: QQ.QuasiQuoter 
 base16 = QQ.QuasiQuoter {
   QQ.quoteExp = base16Exp ,
-  QQ.quoteDec = undefined ,
-  QQ.quotePat = undefined ,
-  QQ.quoteType = undefined 
+  QQ.quoteDec = error "Usage as declaration is not supported",
+  QQ.quotePat = error "Usage as pattern is not supported" ,
+  QQ.quoteType = error "Usage as type is not supported"
 }
 
 -- | shamelessly using Text.Data.URI, no documentation needed, library was tested via quickcheck by the author, no tests needed for this part
@@ -137,7 +137,7 @@ uriExp str = case URI.mkURI (Text.pack str) of
 uri :: QQ.QuasiQuoter 
 uri = QQ.QuasiQuoter {
   QQ.quoteExp = uriExp ,
-  QQ.quoteDec = undefined ,
-  QQ.quotePat = undefined ,
-  QQ.quoteType = undefined
+  QQ.quoteDec = error "Usage as declaration is not supported" ,
+  QQ.quotePat = error "Usage as pattern is not supported" ,
+  QQ.quoteType = error "Usage as type is not supported"
 } 
