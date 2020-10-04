@@ -5,9 +5,10 @@
 module Lib where
 
 import           Control.Monad
-import qualified Data.ByteString as BStr (ByteString) 
-import qualified Data.ByteString.Conversion as Conv (toByteString')
+import qualified Data.ByteString as BStr (ByteString, empty) 
+import qualified Data.ByteString.Conversion as Conv (toByteString', fromByteString)
 import qualified Data.ByteString.Base64 as Base64 (decode)
+import qualified Data.ByteString.Base16 as Base16 (decode)
 import qualified Data.ByteString.Internal as BSInt (toForeignPtr)
 import qualified Data.Char as Chr (chr)
 import qualified Data.Vector.Storable as SV (Vector, head, unsafeFromForeignPtr)
@@ -51,10 +52,12 @@ base64Decode str = case Base64.decode $ Conv.toByteString' str of
 base64Exp :: String -> TH.ExpQ 
 base64Exp str = do
   filename <- TH.loc_filename `fmap` TH.location
-  case liftM (++ (if length (filter (== '=') str) < 3 then replicate (length (filter (== '=') str)) '=' else "")) (Parsec.parse checkBase64Str filename str) of 
+  case liftM padding (Parsec.parse checkBase64Str filename str) of 
     Left _ -> error "Please enter base64 encoded value"
     Right properStr -> [|base64Decode properStr|]
-
+  where
+    padding = (++ (if numOfPadding  < 3 then replicate numOfPadding '=' else ""))
+    numOfPadding = length (filter (== '=') str)
 base64 :: QQ.QuasiQuoter 
 base64 = QQ.QuasiQuoter {
   QQ.quoteExp = base64Exp ,
@@ -62,6 +65,37 @@ base64 = QQ.QuasiQuoter {
   QQ.quotePat = undefined ,
   QQ.quoteType = undefined 
 }
+
+base16Alph = map Chr.chr $ [48..57] ++ [65..70]
+ 
+checkBase16Chr :: Parsec.Parser Char
+checkBase16Chr = Parsec.oneOf base16Alph
+
+checkBase16Str :: Parsec.Parser String
+checkBase16Str = liftM concat $ Parsec.many1 $ Parsec.spaces >> Parsec.many1 checkBase16Chr
+
+base16Decode :: St.Storable a => String -> SV.Vector a
+base16Decode str = if (snd base16Str == BStr.empty) then byteStringToVector $ fst base16Str else error "Please enter base16 encoded data"
+  where 
+    base16Str = Base16.decode $ Conv.toByteString' str 
+ -- (BS.empty, base16Str) -> byteStringToVector base16Str
+ -- (err, _) -> error $ Conv.fromByteString err
+
+base16Exp :: String -> TH.ExpQ 
+base16Exp str = do
+  filename <- TH.loc_filename `fmap` TH.location
+  case Parsec.parse checkBase16Str filename str of 
+    Left _ -> error "Please enter base16 encoded value"
+    Right properStr -> [|base16Decode properStr|]
+
+base16 :: QQ.QuasiQuoter 
+base16 = QQ.QuasiQuoter {
+  QQ.quoteExp = base16Exp ,
+  QQ.quoteDec = undefined ,
+  QQ.quotePat = undefined ,
+  QQ.quoteType = undefined 
+}
+
 
 uriExp :: String -> TH.ExpQ
 uriExp str = case URI.mkURI (Text.pack str) of
