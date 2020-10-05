@@ -8,6 +8,10 @@ import qualified Data.Word as Word (Word8, Word16, Word32)
 
 import Lib
 
+
+-- I am testing slices only since other parts of my code were tested by the authors of packages
+-- I could've copy pasted the code, but i don't a point in doing so
+
 genWord8List :: Gen [Word.Word8]
 genWord8List =
   let listLength = Range.linear 0 10000
