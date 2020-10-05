@@ -132,7 +132,7 @@ base16 = QQ.QuasiQuoter {
   QQ.quoteType = error "Usage as type is not supported"
 }
 
--- | shamelessly using Text.Data.URI, no documentation needed, library was tested via quickcheck by the author, no tests needed for this part
+-- | shamelessly using Text.Data.URI, no documentation needed, library was tested via quickcheck by the author, no tests needed for this part; i am not skipping spaces, since who would type a url with some add spaces
 
 uriExp :: String -> TH.ExpQ
 uriExp str = case URI.mkURI (Text.pack str) of
