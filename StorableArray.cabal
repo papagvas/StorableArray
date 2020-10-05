@@ -69,4 +69,6 @@ test-suite StorableArray-test
   build-depends:
       StorableArray
     , base >=4.7 && <5
+    , hedgehog
+    , vector
   default-language: Haskell2010

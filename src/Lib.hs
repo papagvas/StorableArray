@@ -2,7 +2,12 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Lib where
+module Lib 
+  ( mkSlice
+  , base64
+  , base16
+  , uri
+  ) where
 
 import           Control.Monad
 import qualified Data.ByteString as BStr (ByteString, empty) 
